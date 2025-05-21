@@ -1,0 +1,21 @@
+#Build folders
+bin/
+obj/
+
+#IDE configs
+.idea/
+*.sln.iml
+
+#Test results
+TestResult*/
+*.trx
+
+#Local
+appsettings.Development.json
+appsettings.Local.json
+.env
+
+#NuGet packages
+*.nupkg
+*.snupkg
+packages/

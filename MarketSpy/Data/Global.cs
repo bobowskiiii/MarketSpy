@@ -1,0 +1,11 @@
+global using Microsoft.EntityFrameworkCore;
+global using System.Text.Json.Serialization;
+global using Microsoft.AspNetCore.Http.Json;
+global using Microsoft.OpenApi.Models;
+global using MarketSpy.Data;
+global using MarketSpy.Models;
+global using Flurl;
+global using Flurl.Http;
+global using MarketSpy.DtoS;
+global using Newtonsoft.Json;
+global using MarketSpy.CoinAPI;
