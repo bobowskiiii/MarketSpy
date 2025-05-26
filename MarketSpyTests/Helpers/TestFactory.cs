@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using MarketSpy.CoinAPI;
-
 namespace TestProject1.Helpers;
 
 public class TestFactory
@@ -9,7 +6,8 @@ public class TestFactory
     {
         var inMemorySettings = new Dictionary<string, string>
         {
-            { "CoinGeckoApiKey", apiKey }
+            { "CoinGeckoApiKey", apiKey },
+            { "OpenAiKey", apiKey }
         };
 
         return new ConfigurationBuilder()
@@ -21,5 +19,18 @@ public class TestFactory
     {
         var config = CreateConfig(apiKey);
         return new CoinGeckoClient(config);
+    }
+
+    public static AiService CreateAiService(HttpClient client,string apiKey = "123456")
+    {
+        var config = CreateConfig(apiKey);
+        return new AiService(client, config);
+    }
+
+    public static DbContextOptions<MarketSpyDbContext> CreateInMemoryDbOptions(string dbName = "TestDb")
+    {
+        return new DbContextOptionsBuilder<MarketSpyDbContext>()
+            .UseInMemoryDatabase(databaseName: dbName)
+            .Options;
     }
 }

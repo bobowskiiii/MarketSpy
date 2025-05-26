@@ -39,6 +39,10 @@ public class AiService
         var responseContent = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(responseContent);
+        var choices = doc.RootElement.GetProperty("choices");
+        if (choices.GetArrayLength() == 0)
+            return string.Empty;
+        
         var result = doc.RootElement
             .GetProperty("choices")[0]
             .GetProperty("message")
