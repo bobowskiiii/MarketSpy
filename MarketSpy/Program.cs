@@ -133,23 +133,26 @@ app.MapPut("/assets/{id}", async (int id, Asset updatedAsset, MarketSpyDbContext
     return Results.Ok(asset);
 });
 
-// //Delete Asset by id
-// app.MapDelete("/assets/{id}", async (int id, MarketSpyDbContext db) =>
-// {
-//     var asset = await db.Assets
-//         .FindAsync(id);
-//     if (asset == null)
-//         return Results.NotFound();
-//     db.Assets.Remove(asset);
-//     await db.SaveChangesAsync();
-//     
-//     return Results.Ok(asset);
-// });
+//Delete Asset by id
+app.MapDelete("/assets/{id}", async (int id, MarketSpyDbContext db) =>
+{
+    var asset = await db.Assets
+        .FindAsync(id);
+    if (asset == null)
+        return Results.NotFound();
+    db.Assets.Remove(asset);
+    await db.SaveChangesAsync();
+    
+    return Results.Ok(asset);
+});
 
 //Paginacja
 
 app.MapGet("/assetsPaged", async (MarketSpyDbContext db) =>
 {
+    var filter = "a";
+    var sortBy = "UsdChange24h";
+    var sortByDesc = true;
     var page = 1;
     var pageSize = 5;
     var assets = await db.Assets

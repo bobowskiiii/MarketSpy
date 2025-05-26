@@ -6,7 +6,6 @@ global using MarketSpy.Data;
 global using MarketSpy.Models;
 global using Flurl;
 global using Flurl.Http;
-global using MarketSpy.DtoS;
 global using Newtonsoft.Json;
 global using MarketSpy.CoinAPI;
 global using MarketSpy.IAssetService;

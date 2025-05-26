@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketSpy", "MarketSpy\MarketSpy.csproj", "{A2643A6E-86A3-4CE9-9B05-67A8E799D47A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketSpyTests", "MarketSpyTests\MarketSpyTests.csproj", "{544CA8F6-E608-459C-B6D9-6B08328F0D1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{A2643A6E-86A3-4CE9-9B05-67A8E799D47A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2643A6E-86A3-4CE9-9B05-67A8E799D47A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2643A6E-86A3-4CE9-9B05-67A8E799D47A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{544CA8F6-E608-459C-B6D9-6B08328F0D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{544CA8F6-E608-459C-B6D9-6B08328F0D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{544CA8F6-E608-459C-B6D9-6B08328F0D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{544CA8F6-E608-459C-B6D9-6B08328F0D1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

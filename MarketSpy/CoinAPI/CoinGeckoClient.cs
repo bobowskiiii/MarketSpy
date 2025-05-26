@@ -1,15 +1,14 @@
-using MarketSpy.DtoS;
-
 namespace MarketSpy.CoinAPI;
 
 public class CoinGeckoClient
 {
      private readonly string? _apiKey;
-
      public CoinGeckoClient(IConfiguration config)
      {
+          if (config == null) throw new ArgumentNullException("Missing key in configuration");
           _apiKey = config["CoinGeckoApiKey"];
      }
+     
      public async Task<Dictionary<string, CoinConfig>> GetCoinsAsync(List<string> assetNames)
      {
           string url = "https://api.coingecko.com/api/v3/simple/price";
