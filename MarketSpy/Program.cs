@@ -59,8 +59,35 @@ using (var scope = app.Services.CreateScope())
     foreach (var coin in coins) await assetStorage.SaveAssetAsync(coin.Key, coin.Value);
 }
 
+//Obsługa błędów
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+        if (contextFeature is not null)
+        {
+            Console.WriteLine($"Error: {contextFeature.Error}");
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                StatusCode = context.Response.StatusCode,
+                Message = "Internal server error",
+            });
+        }
+    });
+});
+
 
 //Endpointy
+
+app.MapGet("/test", () =>
+{
+    throw new Exception("Test exception");
+});
 
 //List of all assets
 app.MapGet("/assets", async (MarketSpyDbContext db) =>
