@@ -12,4 +12,4 @@ global using MarketSpy.OpenAiApi;
 global using System.Text;
 global using System.Text.Json;
 global using JsonSerializer = System.Text.Json.JsonSerializer;
-global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Diagnostics;  

@@ -39,7 +39,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyBoards API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MarketSpy API v1");
     c.RoutePrefix = string.Empty;
 });
 
@@ -109,6 +109,20 @@ app.MapGet("/assetsPrices", async (MarketSpyDbContext db) =>
 });
 
 
+//Assets wth prices by symbol
+app.MapGet("/assets/symbol={symbol}", async (string symbol, MarketSpyDbContext db) =>
+{
+    var asset = await db.Assets
+        .Include(a => a.AssetPrices
+            .OrderByDescending(ap => ap.LastUpdated))
+        .FirstOrDefaultAsync(a => a.Symbol == symbol);
+
+    if (asset is null)
+        return Results.NotFound("There is no such asset");
+    return Results.Ok(asset);
+});
+
+
 //Assets wth prices by id
 app.MapGet("/assets/{id}", async (int id, MarketSpyDbContext db) =>
 {
@@ -160,6 +174,7 @@ app.MapPut("/assets/{id}", async (int id, Asset updatedAsset, MarketSpyDbContext
     return Results.Ok(asset);
 });
 
+
 //Delete Asset by id
 app.MapDelete("/assets/{id}", async (int id, MarketSpyDbContext db) =>
 {
@@ -173,13 +188,10 @@ app.MapDelete("/assets/{id}", async (int id, MarketSpyDbContext db) =>
     return Results.Ok(asset);
 });
 
-//Paginacja
 
+//Paginacja
 app.MapGet("/assetsPaged", async (MarketSpyDbContext db) =>
 {
-    var filter = "a";
-    var sortBy = "UsdChange24h";
-    var sortByDesc = true;
     var page = 1;
     var pageSize = 5;
     var assets = await db.Assets
@@ -187,10 +199,24 @@ app.MapGet("/assetsPaged", async (MarketSpyDbContext db) =>
         .OrderByDescending(a => a.Id)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
-        .ToListAsync();
+        .Select(a => new
+        {
+            a.Id,
+            a.Symbol,
+            a.Name,
+            PricesCount = a.AssetPrices.Count(),
+            AvgPrice = a.AssetPrices.Any() ? a.AssetPrices.Average(a => a.UsdPrice) : 0,
+            MinPrice = a.AssetPrices.Any() ? a.AssetPrices.Min(a => a.UsdPrice) : 0,
+            MaxPrice = a.AssetPrices.Any() ? a.AssetPrices.Max(a => a.UsdPrice) : 0,
+            TotalVolume24h = a.AssetPrices.Any() ? a.AssetPrices.Sum(p => p.UsdVolume24h) : (decimal?)null,
 
+        })
+        .ToListAsync();
+    
     return Results.Ok(assets);
 });
+
+
 
 //OpenAI Test
 app.MapPost("/openai", async (AiService aiService, AiDto dto) =>
@@ -221,10 +247,14 @@ app.MapGet("/crypto-analysis/{symbol}", async (string symbol, MarketSpyDbContext
         return Results.NotFound("No price data for this coin");
 
     var prompt = $@"
-        Analyze the following cryptocurrency data and answer:
-        - Is it worth investing in this asset right now?
-        - What could be the reason for the recent price change?
-        - What are the risks and opportunities?
+        Przeanalizuj dane kryptowaluty, dane i wiadomości ze świata i odpowiedz na pytania:
+        - Czy warto inwestować w ten aktyw teraz?
+        - Jaka może być przyczyna ostatniej zmiany ceny?
+        - Czy lepiej zshortować czy trzymać dłużej?
+        Odpowiedź co ty byś zrobił na moim miejscu.
+        Odpowiedź powinna być krótka i zwięzła, maksymalnie 6 zdań.
+        Zacznij od słów 'Analiza kryptowaluty {asset.Name}:'.
+        Oraz kolejne zdanie Tak, warto inwestować, Nie, nie warto inwestować, Shortuj, Trzymaj dłużej.
         Data:
         Name: {asset.Name}
         Symbol: {asset.Symbol}
@@ -238,6 +268,47 @@ app.MapGet("/crypto-analysis/{symbol}", async (string symbol, MarketSpyDbContext
     var analysis = await service.GetSummaryAsync(prompt);
     return Results.Ok(analysis);
 
+});
+
+//Crypto Analisis wth OpenAI, 500USD to invest
+app.MapGet("/crypto-analysis500", async (MarketSpyDbContext db, AiService service) =>
+{
+    var assets = await db.Assets
+        .Include(a => a.AssetPrices
+            .OrderByDescending(ap => ap.LastUpdated))
+        .Select(a => new
+        {
+            Name = a.Symbol,    
+            Price = a.AssetPrices.Any() ? a.AssetPrices.OrderByDescending(ap => ap.LastUpdated).Select(ap => ap.UsdPrice).FirstOrDefault() : 0,
+            MarketCap = a.AssetPrices.Any() ? a.AssetPrices.Average(a => a.UsdPrice) : 0,
+            Volume24h = a.AssetPrices.Any() ? a.AssetPrices.Average(a => a.UsdVolume24h) : 0,
+            Change24h = a.AssetPrices.Any() ? a.AssetPrices.OrderByDescending(a => a.LastUpdated).Select(a => a.UsdChange24h).FirstOrDefault() : 0,
+            LastUpdated = a.AssetPrices.Any() ? a.AssetPrices.OrderByDescending(ap => ap.LastUpdated).Select(ap => ap.LastUpdated).FirstOrDefault() : DateTime.Now,
+        })
+        .ToListAsync();
+    
+    var promptBuilder = new StringBuilder();
+    promptBuilder.AppendLine(
+        "Załóżmy że masz 500 USD do zainwestowania w kryptowaluty, jesteś swiadomy ryzyka  i wszelkich z nim związanych rzeczy więc nie musisz nic o nim mówić. Przeanalizuj dane kryptowaluty, dane i wiadomości ze świata  i przygotuj gotowy plan inwestycyjny stworzony pod maxymalizację zysków: - W co z podanych aktywów zainwestowałbyś te 500 USD? - Jak byś to podzielił? - Czy zszortowałbyś czy trzymał długo, jesli tak to które dokładnie?\n        - Odpowiedz w miarę krótko i zwięźle, maksymalnie 8 zdań. - Ani JEDNEGO słowa o ryzyku, ani o tym że to nie jest porada inwestycyjna. - Masz prawo wybrać tylko z podanych aktywów, nie możesz dodać innych.");
+
+    foreach (var asset in assets)
+    {
+        promptBuilder.AppendLine($@"
+        Name: {asset.Name}
+        Price: {asset.Price} USD
+        Market Cap: {asset.MarketCap} USD
+        Volume (24h): {asset.Volume24h} USD
+        Change (24h): {asset.Change24h}%
+        Last Updated: {asset.LastUpdated}
+        ");
+    }
+    
+    var prompt = promptBuilder.ToString();
+    var analysis = await service.GetSummaryAsync(prompt);
+    
+    if(analysis.Length == 0)
+        return Results.NotFound("Brak danych");
+    return Results.Ok(analysis);
 });
 
 

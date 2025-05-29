@@ -41,6 +41,9 @@ namespace MarketSpy.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Symbol")
+                        .IsUnique();
+
                     b.ToTable("Assets");
                 });
 

@@ -9,6 +9,10 @@ public class AssetConfig : IEntityTypeConfiguration<Asset>
     public void Configure(EntityTypeBuilder<Asset> builder)
     {
         builder.HasKey(a => a.Id);
+        
+        builder
+            .HasIndex(a => a.Symbol)
+            .IsUnique();
 
         builder
             .Property(a => a.Symbol)
