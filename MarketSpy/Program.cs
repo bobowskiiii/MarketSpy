@@ -122,6 +122,43 @@ app.MapGet("/assets/symbol={symbol}", async (string symbol, MarketSpyDbContext d
     return Results.Ok(asset);
 });
 
+//Asset wth prices if true
+app.MapGet("/assets/istrue/{symbol}", async (string symbol, MarketSpyDbContext db) =>
+{
+    var wthHistData = true;
+    
+    var asset = await db.Assets
+        .Include(a => a.AssetPrices)
+        .FirstOrDefaultAsync(a => a.Symbol == symbol);
+    
+    if(asset is null)
+        return Results.NotFound("There is no such asset");
+        
+
+    if (wthHistData)
+        return Results.Ok(new
+        {
+            Name = asset?.Name,
+            UsdPrice = asset?.AssetPrices.OrderByDescending(ap => ap.LastUpdated).Select(ap => new
+            {
+                Price = ap.UsdPrice,
+                MarketCap = ap.UsdMarketCap,
+                Volume24h = ap.UsdVolume24h,
+                Change24h = ap.UsdChange24h,
+                LastUpdated = ap.LastUpdated
+            }).FirstOrDefault()
+        });
+
+    return Results.Ok(new
+    {
+        Name = asset?.Name,
+        UsdPrice = asset?.AssetPrices
+            .OrderByDescending(ap => ap.LastUpdated)
+            .Select(ap => ap.UsdPrice)
+            .FirstOrDefault()
+    });
+});
+
 
 //Assets wth prices by id
 app.MapGet("/assets/{id}", async (int id, MarketSpyDbContext db) =>
