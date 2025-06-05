@@ -38,5 +38,4 @@ public class CoinGeckoClient
           }
           return results;
      }
-     
 }

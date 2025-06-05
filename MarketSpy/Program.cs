@@ -63,7 +63,8 @@ using (var scope = app.Services.CreateScope())
     var assetsToFetch = new List<string> { "bitcoin", "ethereum", "xrp", "dogecoin", "solana" };
     var coins = await coinClient.GetCoinsAsync(assetsToFetch);
 
-    foreach (var coin in coins) await assetStorage.SaveAssetAsync(coin.Key, coin.Value);
+    foreach (var coin in coins) 
+        await assetStorage.SaveAssetAsync(coin.Key, coin.Value);
 }
 
 //Obsługa błędów
@@ -91,5 +92,6 @@ app.UseExceptionHandler(appError =>
 
 //Endpointy
 app.MapAssetEndpoints();
+app.MapCoinEndpoints();
 
 app.Run();
