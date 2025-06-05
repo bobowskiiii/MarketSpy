@@ -1,4 +1,5 @@
 
+using MarketSpy.DtoS.Validators;
 using MarketSpy.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +34,11 @@ builder.Services.AddDbContext<MarketSpyDbContext>(options =>
 builder.Services.AddScoped<AiService>();
 builder.Services.AddScoped<IAssetStorage, AssetStorage>();
 builder.Services.AddScoped<CoinGeckoClient>();
-builder.Services.AddHttpClient<AiService>();    
+builder.Services.AddHttpClient<AiService>();   
+
+//FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<CoinValidator>();
+
 
 var app = builder.Build();
 
