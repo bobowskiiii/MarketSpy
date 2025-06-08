@@ -10,6 +10,7 @@ public class MarketSpyDbContext : DbContext
     
     public DbSet<Asset> Assets { get; set; }
     public DbSet<AssetPrice> AssetPrices { get; set; }
+    public DbSet<User> Users { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

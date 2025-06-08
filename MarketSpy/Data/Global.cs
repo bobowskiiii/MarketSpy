@@ -14,3 +14,6 @@ global using System.Text.Json;
 global using JsonSerializer = System.Text.Json.JsonSerializer;
 global using Microsoft.AspNetCore.Diagnostics;
 global using FluentValidation;
+global using MarketSpy.DtoS.Validators;
+global using MarketSpy.Endpoints;
+global using MarketSpy.Services.UserService;

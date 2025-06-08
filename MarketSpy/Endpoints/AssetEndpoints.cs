@@ -234,6 +234,8 @@ public static class AssetEndpoints
             Odpowiedź powinna być krótka i zwięzła, maksymalnie 6 zdań.
             Zacznij od słów 'Analiza kryptowaluty {asset.Name}:'.
             Oraz kolejne zdanie Tak, warto inwestować, Nie, nie warto inwestować, Shortuj, Trzymaj dłużej.
+            Weź pod uwagę ostatnie wydarzenia i wiadomości ze świata kryptowalut/i ogolnie swiata
+            , do swojej analizy bo dobrze wiemy że może to mieć duży wpływ.
             Data:
             Name: {asset.Name}
             Symbol: {asset.Symbol}
@@ -276,7 +278,18 @@ public static class AssetEndpoints
 
             var promptBuilder = new StringBuilder();
             promptBuilder.AppendLine(
-                "Załóżmy że masz 500 USD do zainwestowania w kryptowaluty, jesteś swiadomy ryzyka  i wszelkich z nim związanych rzeczy więc nie musisz nic o nim mówić. Przeanalizuj dane kryptowaluty, dane i wiadomości ze świata  i przygotuj gotowy plan inwestycyjny stworzony pod maxymalizację zysków: - W co z podanych aktywów zainwestowałbyś te 500 USD? - Jak byś to podzielił? - Czy zszortowałbyś czy trzymał długo, jesli tak to które dokładnie?\n        - Odpowiedz w miarę krótko i zwięźle, maksymalnie 8 zdań. - Ani JEDNEGO słowa o ryzyku, ani o tym że to nie jest porada inwestycyjna. - Masz prawo wybrać tylko z podanych aktywów, nie możesz dodać innych.");
+                "Załóżmy że masz 500 USD do zainwestowania w kryptowaluty," +
+                " jesteś swiadomy ryzyka  i wszelkich z nim związanych rzeczy " +
+                "więc nie musisz nic o nim mówić. Przeanalizuj dane kryptowaluty, " +
+                "dane i wiadomości ze świata  i przygotuj gotowy plan inwestycyjny " +
+                "stworzony pod maxymalizację zysków: " +
+                "- W co z podanych aktywów zainwestowałbyś te 500 USD? " +
+                "- Jak byś to podzielił? " +
+                "- Czy zszortowałbyś czy trzymał długo, jesli tak to które dokładnie?" +
+                "- Odpowiedz w miarę krótko i zwięźle, maksymalnie 8 zdań. " +
+                "- Ani JEDNEGO słowa o ryzyku, ani o tym że to nie jest porada inwestycyjna. " +
+                "- Masz prawo wybrać tylko z podanych aktywów, nie możesz dodać innych. " +
+                "Podaj w skrócie(ale serio dużym skrócie wydarzenia z ostatnich dni/tygodni ze świata które uwierzytelniają twoją tezę które powinny wzrosnąć itd ");
 
             foreach (var asset in assets)
             {
