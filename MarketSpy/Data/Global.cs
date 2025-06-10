@@ -17,3 +17,4 @@ global using FluentValidation;
 global using MarketSpy.DtoS.Validators;
 global using MarketSpy.Endpoints;
 global using MarketSpy.Services.UserService;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;

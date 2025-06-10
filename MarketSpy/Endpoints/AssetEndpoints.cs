@@ -248,7 +248,9 @@ public static class AssetEndpoints
 
             var analysis = await service.GetSummaryAsync(prompt);
             return Results.Ok(analysis);
-        });
+        })
+        .RequireAuthorization();
+        
 
         //Crypto Analisis wth OpenAI, 500USD to invest
         app.MapGet("/crypto-analysis500", async (MarketSpyDbContext db, AiService service) =>
@@ -309,6 +311,7 @@ public static class AssetEndpoints
             if (analysis.Length == 0)
                 return Results.NotFound("Brak danych");
             return Results.Ok(analysis);
-        });
+        })
+        .RequireAuthorization();
     }
 }

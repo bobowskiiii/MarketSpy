@@ -1,3 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+
 namespace MarketSpy.Endpoints;
 
 public static class UserEndpoints
@@ -23,6 +27,37 @@ public static class UserEndpoints
             db.Users.Add(user);
             await db.SaveChangesAsync();
             return Results.Ok("User registered successfully");
+        });
+        
+        //Login user and return JWT token
+        app.MapPost("/login", async (UserDto dto, MarketSpyDbContext db, PasswordService hasher, IConfiguration config) =>
+        {
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+            if (user == null || !hasher.VerifyPassword(user, dto.Password, user.PasswordHash))
+                return Results.Unauthorized();
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            };
+            
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            
+            var token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: creds);
+            
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Results.Ok(new
+            {
+                token = tokenString,
+            });
         });
         
         //Get all users
